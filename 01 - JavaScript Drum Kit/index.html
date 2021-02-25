@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JS Drum Kit</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="keys">
+      <div data-key="65" class="key">
+        <kbd>A</kbd>
+        <span class="sound">clap</span>
+      </div>
+      <div data-key="83" class="key">
+        <kbd>S</kbd>
+        <span class="sound">hihat</span>
+      </div>
+      <div data-key="68" class="key">
+        <kbd>D</kbd>
+        <span class="sound">kick</span>
+      </div>
+      <div data-key="70" class="key">
+        <kbd>F</kbd>
+        <span class="sound">openhat</span>
+      </div>
+      <div data-key="71" class="key">
+        <kbd>G</kbd>
+        <span class="sound">boom</span>
+      </div>
+      <div data-key="72" class="key">
+        <kbd>H</kbd>
+        <span class="sound">ride</span>
+      </div>
+      <div data-key="74" class="key">
+        <kbd>J</kbd>
+        <span class="sound">snare</span>
+      </div>
+      <div data-key="75" class="key">
+        <kbd>K</kbd>
+        <span class="sound">tom</span>
+      </div>
+      <div data-key="76" class="key">
+        <kbd>L</kbd>
+        <span class="sound">tink</span>
+      </div>
+    </div>
+
+    <audio data-key="65" src="sounds/clap.wav"></audio>
+    <audio data-key="83" src="sounds/hihat.wav"></audio>
+    <audio data-key="68" src="sounds/kick.wav"></audio>
+    <audio data-key="70" src="sounds/openhat.wav"></audio>
+    <audio data-key="71" src="sounds/boom.wav"></audio>
+    <audio data-key="72" src="sounds/ride.wav"></audio>
+    <audio data-key="74" src="sounds/snare.wav"></audio>
+    <audio data-key="75" src="sounds/tom.wav"></audio>
+    <audio data-key="76" src="sounds/tink.wav"></audio>
+
+    <script>
+      //transitionend 이벤트의 propertyName이 transform일 때만 엘리먼트의 클래스 리스트에서 'playing' 클래스 삭제
+      //style.css 파일 보면 'playing' 클래스에 transform 관련 스타일 적용되어 있음
+      //삭제 안 하면 transform 스타일 코드 실행된 결과가 화면에 그대로 존재
+      function removeTransition(e) {
+        if (e.propertyName !== "transform") {
+          return;
+        }
+        e.target.classList.remove("playing");
+      }
+
+      //keydown 이벤트 객체의 keyCode 프로퍼티 값은 눌린 키의 값
+      //audio, div.key 태그들에 실행되기 위해 눌려야 하는 키의 값이 data-key 프로퍼티로 들어가 있음
+      //키에 해당되는 div.key 태그에 'playing' 클래스 추가하고 audio 실행
+      function playSound(e) {
+        const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+        const key = document.querySelector(`div[data-key="${e.keyCode}"]`);
+        if (!audio) {
+          return;
+        }
+
+        key.classList.add("playing");
+        //오디오가 처음부터 실행되도록
+        audio.currentTime = 0;
+        audio.play();
+      }
+
+      //'key' class를 가지는 NodeList(엘리먼트 리스트 표현)를 반환
+      const keys = document.querySelectorAll(".key");
+      //각 엘리먼트에 transitionend 이벤트가 전달될 때마다 removeTransition 함수 호출
+      //엘리먼트 각각에 addEventListener 해주어야 함
+      keys.forEach((key) =>
+        key.addEventListener("transitionend", removeTransition)
+      );
+      //브라우저의 현재 탭에서 keydown 이벤트가 발생할 때마다 playSound 함수 호출
+      window.addEventListener("keydown", playSound);
+    </script>
+  </body>
+</html>
